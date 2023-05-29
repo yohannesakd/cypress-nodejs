@@ -108,8 +108,8 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 INSERT INTO `users` (`id`, `fname`, `lname`, `gender`, `email`, `password`, `level`, `token`) VALUES
 (10, 'Chere', 'Lemma', 'Male', 'chere.lemma@aastu.edu.et', '$2a$10$YyVz7JfNu.laUR37p5sEzOXr6oIp0etJlvE3GIjDuHeKnYaHYUCam', 1, 'T2v5b8g7QpT4nwvcKXRb'),
-(13, 'Yared', 'Tassew', 'Male', 'yared.tassew@aastu.edu.et', '$2a$10$J.lYwYZ26R1cbLRyP8X7H.4LQ.a0kxZ1WRP46mCwg2Z3yiyzPM9P.', 0, NULL),
-(16, 'Yohannes', 'Assefa', 'Male', 'yoniassefayoni@gmail.com', '$2a$10$7PPlB4sYZfu35CYgx7njau4Np6uwg/z9EPKPcfGNL4Hk2fAUnWW6e', 0, NULL);
+(0, 'Yared', 'Tassew', 'Male', 'yared.tassew@aastu.edu.et', '$2a$10$J.lYwYZ26R1cbLRyP8X7H.4LQ.a0kxZ1WRP46mCwg2Z3yiyzPM9P.', 0, NULL),
+(13, 'Yohannes', 'Assefa', 'Male', 'yoniassefayoni@gmail.com', '$2a$10$7PPlB4sYZfu35CYgx7njau4Np6uwg/z9EPKPcfGNL4Hk2fAUnWW6e', 0, NULL);
 
 --
 -- Indexes for dumped tables

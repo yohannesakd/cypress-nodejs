@@ -3,6 +3,10 @@ describe("Logging In", function () {
     const email = "yoniassefayoni@gmail.com"
     const password = "Yohannes123"
 
+    before(() => {
+        cy.clearAllCookies()
+    })
+
     context("Unauthorized attempt", function () {
         it("is redirected on visit to /homepage when no session", function () {
             // we must have a valid session cookie to be logged
@@ -103,6 +107,15 @@ describe("Logging In", function () {
             // or another protected page
             cy.visit("http://localhost:5000/pages/display")
             cy.get("h2").should("contain", "CRUD RESTful API")
+        })
+    })
+
+    context("Logging out", () => {
+        it("can logout", () => {
+            cy.loginByForm(email, password)
+            cy.visit("http://localhost:5000/homepage")
+            cy.get('a[href="/logout"]').click()
+            cy.url().should("contain", "/auth/login")
         })
     })
 })
