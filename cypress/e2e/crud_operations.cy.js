@@ -243,4 +243,60 @@ describe("Delete Records", () => {
     })
 })
 
-describe("Edit records", () => {})
+describe("Edit records", () => {
+    beforeEach(() => {
+        cy.loginByForm(email, password)
+        cy.addRecord(validCourseFormInput)
+        cy.visit(
+            "http://localhost:5000/pages/edit/" +
+                validCourseFormInput.course_code
+        )
+    })
+    before(() => {
+        cy.test_cleanup()
+    })
+    context("Edit form validations", () => {
+        Object.entries(courseFormInputAndExpectedErrors).forEach(
+            (item, index) => {
+                it.only(`Tests ${item[0]} Validation`, () => {
+                    item[1].input.forEach((text, idx) => {
+                        cy.get("input, textarea").each((item) => {
+                            cy.wrap(item).clear({ delay: 0 })
+                        })
+                        if (index > 0) {
+                            for (let i = 0; i < index; i++) {
+                                cy.get(
+                                    `[name="${
+                                        Object.keys(
+                                            courseFormInputAndExpectedErrors
+                                        )[i]
+                                    }"]`
+                                ).type(
+                                    Object.values(
+                                        courseFormInputAndExpectedErrors
+                                    )[i].input.at(-1),
+                                    { delay: 0 }
+                                )
+                            }
+                        }
+                        if (text) {
+                            cy.get(`[name="${item[0]}"]`).type(text)
+                        } else {
+                            cy.get(`[name="${item[0]}"]`)
+                        }
+                        cy.get("[type=submit]").click()
+                        if (item[1].errors[idx] == "Success") {
+                            cy.title().should("contain", "Display Records")
+                            cy.get(".success-msg").should("be.visible")
+                        } else
+                            [
+                                cy
+                                    .get(".err-msg")
+                                    .should("contain", item[1].errors[idx]),
+                            ]
+                    })
+                })
+            }
+        )
+    })
+})
