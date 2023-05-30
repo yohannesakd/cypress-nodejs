@@ -1,56 +1,66 @@
-describe("Add Items", () => {
-    const email = "yoniassefayoni@gmail.com"
-    const password = "Yohannes123"
+const email = "yoniassefayoni@gmail.com"
+const password = "Yohannes123"
 
-    const courseFormInputAndExpectedErrors = {
-        course_title: {
-            input: ["", "1234", "Software Quality Assurance and Testing"],
-            errors: [
-                "Course title is required",
-                "Course title: Only Characters with white space are allowed",
-                "Course code is required",
-            ],
-        },
-        course_code: {
-            input: ["SQ1", "SQ+1", "SQAT01"],
-            errors: [
-                "Course code must be a minimum of 4 alphanumeric length",
-                "Course code must be alphanumeric",
-                "Course description is required",
-            ],
-        },
-        course_desc: {
-            input: ["Quality assurance and Testing in Software Development"],
-            errors: ["Course category is required"],
-        },
-        course_cat: {
-            input: ["01", "Software Management"],
-            errors: [
-                "Course Category: Only Characters with white space are allowed",
-                "Certificate type is required",
-            ],
-        },
-        certificate: {
-            input: ["01", "Professional Certificate"],
-            errors: [
-                "Certificate type: Only Characters with white space are allowed",
-                "Course duration is required",
-            ],
-        },
-        course_dur: {
-            input: ["abcd", "3"],
-            errors: [
-                "Course duration: Only numbers are allowed",
-                "Course cost is required",
-            ],
-        },
-        course_cost: {
-            input: ["abcd", "550"],
-            errors: ["Course cost: Only numeric values are allowed", "Success"],
-        },
-    }
+const courseFormInputAndExpectedErrors = {
+    course_title: {
+        input: ["", "1234", "Software Quality Assurance and Testing"],
+        errors: [
+            "Course title is required",
+            "Course title: Only Characters with white space are allowed",
+            "Course code is required",
+        ],
+    },
+    course_code: {
+        input: ["SQ1", "SQ+1", "SQAT01"],
+        errors: [
+            "Course code must be a minimum of 4 alphanumeric length",
+            "Course code must be alphanumeric",
+            "Course description is required",
+        ],
+    },
+    course_desc: {
+        input: ["Quality assurance and Testing in Software Development"],
+        errors: ["Course category is required"],
+    },
+    course_cat: {
+        input: ["01", "Software Management"],
+        errors: [
+            "Course Category: Only Characters with white space are allowed",
+            "Certificate type is required",
+        ],
+    },
+    certificate: {
+        input: ["01", "Professional Certificate"],
+        errors: [
+            "Certificate type: Only Characters with white space are allowed",
+            "Course duration is required",
+        ],
+    },
+    course_dur: {
+        input: ["abcd", "3"],
+        errors: [
+            "Course duration: Only numbers are allowed",
+            "Course cost is required",
+        ],
+    },
+    course_cost: {
+        input: ["abcd", "550"],
+        errors: ["Course cost: Only numeric values are allowed", "Success"],
+    },
+}
 
-    context("Input Validation", () => {
+let validCourseFormInput = {}
+
+let values = Object.values(courseFormInputAndExpectedErrors).map((item) => {
+    return item.input.at(-1)
+})
+let keys = Object.keys(courseFormInputAndExpectedErrors)
+keys.forEach((key, index) => {
+    validCourseFormInput[key] = values[index]
+})
+
+describe("Add Records", () => {
+    context("Input Validation and form submission", () => {
         beforeEach(() => {
             cy.loginByForm(email, password)
             cy.visit("http://localhost:5000/pages/add")
@@ -67,16 +77,6 @@ describe("Add Items", () => {
                     item[1].input.forEach((text, idx) => {
                         if (index > 0) {
                             for (let i = 0; i < index; i++) {
-                                console.log(
-                                    Object.keys(
-                                        courseFormInputAndExpectedErrors
-                                    )[i]
-                                )
-                                console.log(
-                                    Object.values(
-                                        courseFormInputAndExpectedErrors
-                                    )[i].input.at(-1)
-                                )
                                 cy.get(
                                     `[name="${
                                         Object.keys(
@@ -111,5 +111,136 @@ describe("Add Items", () => {
                 })
             }
         )
+        it("Checks existing record adding", () => {
+            let inputs = Object.values(courseFormInputAndExpectedErrors).map(
+                (item) => {
+                    return item.input.at(-1)
+                }
+            )
+
+            Object.keys(courseFormInputAndExpectedErrors).forEach(
+                (input, index) => {
+                    cy.get(`[name=${input}]`).type(inputs[index])
+                }
+            )
+            cy.get("[type=submit]").click()
+            cy.get(".err-msg").should(
+                "contain",
+                "Error: Course code already exists"
+            )
+        })
+    })
+
+    context("Form submission with cy.request", () => {
+        beforeEach(() => {
+            cy.loginByForm(email, password)
+        })
+        it("can bypass the UI and add a record", () => {
+            cy.request({
+                method: "POST",
+                url: "http://localhost:5000/pages/add",
+                form: true,
+                body: validCourseFormInput,
+                followRedirect: false,
+            }).then((response) => {
+                expect(response.status).to.eq(200)
+            })
+            cy.visit("http://localhost:5000/pages/display")
+            cy.get("td:first-child").should((rows) => {
+                let items = Object.values(rows)
+                    .slice(0, rows.length)
+                    .map((item) => item.textContent)
+                expect(items).to.contain(
+                    courseFormInputAndExpectedErrors.course_code.input.at(-1)
+                )
+            })
+        })
+
+        it("Custom cypress command for adding record", () => {
+            cy.addRecord(validCourseFormInput)
+            cy.visit("http://localhost:5000/pages/display")
+            cy.get("td:first-child").should((rows) => {
+                let items = Object.values(rows)
+                    .slice(0, rows.length)
+                    .map((item) => item.textContent)
+                expect(items).to.contain(
+                    courseFormInputAndExpectedErrors.course_code.input.at(-1)
+                )
+            })
+        })
     })
 })
+
+describe("Read Records", () => {
+    beforeEach(() => {
+        cy.loginByForm(email, password)
+        cy.visit("http://localhost:5000/pages/display")
+    })
+    before(() => {
+        cy.test_cleanup()
+    })
+
+    context("Viewing Records", () => {
+        it("can visit display page", () => {
+            cy.title().should("contain", "Display Records")
+        })
+        it("can show newly added record", () => {
+            cy.addRecord(validCourseFormInput)
+            cy.visit("http://localhost:5000/pages/display")
+        })
+    })
+    context("Searching records", () => {
+        it("Handles empty search", () => {
+            cy.get('input[type="submit"]').click()
+            cy.get(".success-msg").should(
+                "contain",
+                "Please provide a search key!"
+            )
+        })
+        it("can search records by code", () => {
+            cy.get("input#search-Key").type(validCourseFormInput.course_code)
+            cy.get('input[type="submit"]').click()
+            cy.get("td:first-child").should((rows) => {
+                let items = Object.values(rows)
+                    .slice(0, rows.length)
+                    .map((item) => item.textContent)
+                expect(items).to.contain(validCourseFormInput.course_code)
+            })
+        })
+    })
+})
+
+describe("Delete Records", () => {
+    beforeEach(() => {
+        cy.loginByForm(email, password)
+        cy.addRecord(validCourseFormInput)
+        cy.visit("http://localhost:5000/pages/display")
+    })
+    before(() => {
+        cy.test_cleanup()
+    })
+
+    it("can delete records", () => {
+        //Find button and click
+        cy.get(`a[href="./delete/${validCourseFormInput.course_code}"]`).click()
+        //Reload page
+        cy.visit("http://localhost:5000/pages/display")
+        //Check if entry exists
+        cy.get(`a[href="./delete/${validCourseFormInput.course_code}"]`).should(
+            "not.exist"
+        )
+    })
+    it("can delete records with cy.request", () => {
+        cy.visit(
+            "http://localhost:5000/pages/delete/" +
+                validCourseFormInput.course_code
+        )
+        cy.visit("http://localhost:5000/pages/display")
+
+        cy.get(`a[href="./delete/${validCourseFormInput.course_code}"]`).should(
+            "not.exist"
+        )
+    })
+})
+
+describe("Edit records", () => {})

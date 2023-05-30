@@ -25,6 +25,10 @@ router.post("/homepage", isLoggedin, homePage)
 router.get("/auth/login", isNotLoggedin, loginPage)
 router.post("/auth/login", isNotLoggedin, validator.validationRules[0], login)
 
+router.get("/get-user-id", isLoggedin, (req, res) => {
+    res.json({ userID: req.session.userID })
+})
+
 router.get("/auth/signup", isNotLoggedin, registerPage)
 router.post(
     "/auth/signup",

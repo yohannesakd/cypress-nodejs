@@ -139,7 +139,7 @@ exports.login = (req, res, next) => {
                     req.session.userID = row[0].id
                     req.session.email = row[0].email
                     req.session.level = row[0].level
-                    console.log(req.session)
+                    // console.log(req.session)
                     return res.redirect("/homepage")
                 }
 

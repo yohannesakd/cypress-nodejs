@@ -48,3 +48,22 @@ Cypress.Commands.add("test_cleanup", () => {
         message: "completed",
     })
 })
+
+Cypress.Commands.add("getUserId", () => {
+    return cy.request("http://localhost:5000/get-user-id").then((res) => {
+        return res.body.userID
+    })
+    // return cy.request("http://localhost:5000/get-user-id").then((response) => {
+    //     return response.body.userID
+    // })
+})
+
+Cypress.Commands.add("addRecord", (request) => {
+    return cy.request({
+        method: "POST",
+        url: "http://localhost:5000/pages/add",
+        form: true,
+        body: request,
+        followRedirect: false,
+    })
+})
