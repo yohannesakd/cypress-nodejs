@@ -27,7 +27,6 @@ describe("Logging In", function () {
             }).then((resp) => {
                 // should have status code 302
                 expect(resp.status).to.eq(302)
-
                 // when we turn off following redirects Cypress will also send us
                 // a 'redirectedToUrl' property with the fully qualified URL that we
                 // were redirected to.

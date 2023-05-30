@@ -245,7 +245,7 @@ exports.uploadImage = (req, res, next) => {
         if (req.file == undefined || err) {
             req.flash(
                 "error",
-                "Error: You must select an image.\r\n Only image files [JPG | JPEG | PNG] are allowed!"
+                "Error: You must select an image. Only image files [JPG | JPEG | PNG] are allowed!"
             )
             req.flash("title", "Upload Image")
             return res.redirect("./" + code)

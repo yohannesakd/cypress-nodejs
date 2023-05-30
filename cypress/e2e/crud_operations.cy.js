@@ -258,9 +258,9 @@ describe("Edit records", () => {
     context("Edit form validations", () => {
         Object.entries(courseFormInputAndExpectedErrors).forEach(
             (item, index) => {
-                it.only(`Tests ${item[0]} Validation`, () => {
+                it(`Tests ${item[0]} Validation`, () => {
                     item[1].input.forEach((text, idx) => {
-                        cy.get("input, textarea").each((item) => {
+                        cy.get("input, textarea").each((item, i) => {
                             cy.wrap(item).clear({ delay: 0 })
                         })
                         if (index > 0) {
@@ -298,5 +298,60 @@ describe("Edit records", () => {
                 })
             }
         )
+    })
+    context("Editing course data", () => {
+        let newCourseCode = "SQA1"
+        it("checks if data is changed successfully", () => {
+            cy.get(`input[name=${Object.keys(validCourseFormInput)[1]}]`)
+                .clear()
+                .type(newCourseCode)
+            cy.get("[type=submit]").click()
+
+            cy.get("td:first-child").should((rows) => {
+                let items = Object.values(rows)
+                    .slice(0, rows.length)
+                    .map((item) => item.textContent)
+                expect(items).to.contain(newCourseCode)
+            })
+        })
+    })
+})
+
+describe("Add Images", () => {
+    beforeEach(() => {
+        cy.loginByForm(email, password)
+        cy.addRecord(validCourseFormInput)
+        cy.visit(
+            "http://localhost:5000/pages/addImage/" +
+                validCourseFormInput.course_code
+        )
+    })
+    before(() => {
+        cy.test_cleanup()
+    })
+    it("Requires image to be selected", () => {
+        cy.get("[type=submit]").click()
+        cy.get(".err-msg").should(
+            "contain",
+            "Error: You must select an image. Only image files [JPG | JPEG | PNG] are allowed!"
+        )
+    })
+    it.only("can upload image", () => {
+        const fileName = "logo.png"
+        cy.get('input[type="file"]').attachFile(fileName)
+        cy.get("[type=submit]").click()
+        cy.get(".success-msg").should(
+            "contain",
+            "Image is uploaded. Go back to Home page & check it."
+        )
+    })
+    it.only("Verify if image is uploaded", () => {
+        cy.visit("http://localhost:5000/homepage")
+        cy.get("img").each((img) => {
+            const src = img.attr("src")
+            if (src.includes(validCourseFormInput.course_code)) {
+                expect(src).to.include(validCourseFormInput.course_code)
+            }
+        })
     })
 })
