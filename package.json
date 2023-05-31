@@ -5,7 +5,8 @@
     "main": "app.js",
     "scripts": {
         "test": "npx cypress open",
-        "dev": "nodemon app.js"
+        "dev": "nodemon app.js",
+        "cy:run": "cypress run"
     },
     "keywords": [
         "nodejs",
