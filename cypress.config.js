@@ -9,6 +9,7 @@ const { resetDatabase } = require("./routes/test-api")
 // Database connection settings.
 
 module.exports = defineConfig({
+  projectId: 'whi1kk',
     // experimentalInteractiveRunEvents: true,
     e2e: {
         setupNodeEvents(on, config) {

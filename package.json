@@ -4,7 +4,7 @@
     "description": "This nodejs app is built to demonstrate the various concepts of nodejs backend framework.",
     "main": "app.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "npx cypress open",
         "dev": "nodemon app.js"
     },
     "keywords": [
