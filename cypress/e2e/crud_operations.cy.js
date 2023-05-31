@@ -274,7 +274,7 @@ describe("Edit records", () => {
         //similar execution to the add record validation
         Object.entries(courseFormInputAndExpectedErrors).forEach(
             (item, index) => {
-                it.only(`Tests ${item[0]} Validation`, () => {
+                it(`Tests ${item[0]} Validation`, () => {
                     item[1].input.forEach((text, idx) => {
                         if (index < courseFormInputNames.length - 1) {
                             cy.get(
