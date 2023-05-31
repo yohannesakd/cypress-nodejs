@@ -12,6 +12,18 @@ jobs:
     cypress-run:
         runs-on: ubuntu-latest
 
+        services:
+            mysql:
+                image: mysql:8.0
+                env:
+                    DB_HOST: localhost
+                    DB_USER: root
+                    DB_DATABASE: nodelogin
+                    DB_PORT: 3306
+                ports:
+                    - 3306:3306
+                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
         strategy:
             matrix:
                 node-version: [14.x]
@@ -30,7 +42,7 @@ jobs:
 
             - name: Start local server
               run: npm run start:server &
-      
+
             - name: Wait for server to start
               run: sleep 10
 
